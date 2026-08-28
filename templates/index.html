@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Taller Cifrado Clásico</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="contenedor">
+        <h1>Taller de Cifrado Clásico</h1>
+        <p>Seguridad de la Información — 2026-II — Universidad El Bosque</p>
+
+        <div class="tabs">
+            <button type="button" class="tab-btn {{ 'active' if modo == 'descifrar' else '' }}" data-tab="descifrar">Descifrar (criptoanálisis)</button>
+            <button type="button" class="tab-btn {{ 'active' if modo == 'cifrar' else '' }}" data-tab="cifrar">Cifrar (validación)</button>
+        </div>
+
+        <!-- PANEL DESCIFRAR -->
+        <div class="tab-content {{ 'active' if modo == 'descifrar' else '' }}" id="tab-descifrar">
+            <form method="POST">
+                <input type="hidden" name="modo" value="descifrar">
+                <label for="criptograma">Pega el criptograma (texto cifrado en mayúsculas, A-Z):</label>
+                <textarea id="criptograma" name="criptograma" rows="6" required>{{ texto_ingresado }}</textarea>
+                <button type="submit">Analizar y descifrar</button>
+            </form>
+
+            {% if resultado %}
+            <div class="resultado">
+                <h2>Resultado del análisis</h2>
+
+                <div class="fila"><span class="etiqueta">Longitud del texto normalizado:</span><span>{{ resultado.longitud }} caracteres</span></div>
+                <div class="fila"><span class="etiqueta">Índice de Coincidencia (IC):</span><span>{{ "%.4f"|format(resultado.ic) }}</span></div>
+                <div class="fila"><span class="etiqueta">Tipo de cifrado detectado:</span><span>{{ resultado.tipo_detectado }}</span></div>
+                <div class="fila destacado"><span class="etiqueta">Cifrado identificado:</span><span>{{ resultado.cifrado_identificado }}</span></div>
+                <div class="fila destacado"><span class="etiqueta">Clave encontrada:</span><span>{{ resultado.clave }}</span></div>
+
+                <h3>Conteo de frecuencias (texto cifrado)</h3>
+                <div class="frecuencias">
+                    {% for letra, cantidad in resultado.frecuencias.items() %}
+                        {% if cantidad > 0 %}
+                        <span class="chip">{{ letra }}: {{ cantidad }}</span>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                {% if resultado.kasiski %}
+                <h3>Análisis de Kasiski</h3>
+                <p class="nota">
+                    Se encontraron {{ resultado.kasiski.total_repeticiones }} repeticiones de trigramas.
+                    Distancias entre repeticiones: {{ resultado.kasiski.distancias|join(', ') }}
+                </p>
+                <table class="tabla-kasiski">
+                    <thead>
+                        <tr><th>Longitud de clave candidata</th><th>IC promedio de columnas</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for r in resultado.kasiski.ic_por_longitud %}
+                        <tr class="{{ 'elegida' if r.longitud == resultado.kasiski.longitud_elegida else '' }}">
+                            <td>{{ r.longitud }}</td>
+                            <td>{{ "%.4f"|format(r.ic_promedio) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <p class="nota">Se eligió la longitud {{ resultado.kasiski.longitud_elegida }} por ser la más pequeña con IC alto (columnas monoalfabéticas).</p>
+                {% endif %}
+
+                <h3>Texto descifrado</h3>
+                <div class="texto-descifrado">{{ resultado.texto_descifrado }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- PANEL CIFRAR -->
+        <div class="tab-content {{ 'active' if modo == 'cifrar' else '' }}" id="tab-cifrar">
+            <form method="POST">
+                <input type="hidden" name="modo" value="cifrar">
+                <label for="texto_original">Texto original (se normaliza automáticamente):</label>
+                <textarea id="texto_original" name="texto_original" rows="6" required>{{ texto_original_ingresado }}</textarea>
+
+                <label for="tipo_cifrado">Tipo de cifrado:</label>
+                <select id="tipo_cifrado" name="tipo_cifrado" onchange="mostrarParametros(this.value)">
+                    <option value="cesar" {{ 'selected' if tipo_cifrado_seleccionado == 'cesar' }}>César</option>
+                    <option value="afin" {{ 'selected' if tipo_cifrado_seleccionado == 'afin' }}>Afín</option>
+                    <option value="vigenere" {{ 'selected' if tipo_cifrado_seleccionado == 'vigenere' }}>Vigenère</option>
+                </select>
+
+                <div class="params" id="params-cesar">
+                    <label for="param_k">Desplazamiento k:</label>
+                    <input type="number" id="param_k" name="param_k" value="{{ param_k }}" min="0" max="26">
+                </div>
+
+                <div class="params" id="params-afin" style="display:none">
+                    <label for="param_a">a (coprimo con 27):</label>
+                    <input type="number" id="param_a" name="param_a" value="{{ param_a }}">
+                    <label for="param_b">b:</label>
+                    <input type="number" id="param_b" name="param_b" value="{{ param_b }}">
+                </div>
+
+                <div class="params" id="params-vigenere" style="display:none">
+                    <label for="param_clave">Clave:</label>
+                    <input type="text" id="param_clave" name="param_clave" value="{{ param_clave }}">
+                </div>
+
+                <button type="submit">Cifrar</button>
+            </form>
+
+            {% if resultado_cifrado %}
+            <div class="resultado">
+                {% if resultado_cifrado.error %}
+                    <p class="error">Error: {{ resultado_cifrado.error }}</p>
+                {% else %}
+                    <h3>Texto normalizado</h3>
+                    <div class="texto-descifrado">{{ resultado_cifrado.texto_normalizado }}</div>
+                    <h3>Texto cifrado</h3>
+                    <div class="texto-descifrado">{{ resultado_cifrado.texto_cifrado }}</div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
