@@ -17,4 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const tipoSelect = document.getElementById('tipo_cifrado');
     if (tipoSelect) mostrarParametros(tipoSelect.value);
+
+    document.querySelectorAll('.freq-fill').forEach(el => {
+        el.style.width = el.dataset.pct + '%';
+    });
 });

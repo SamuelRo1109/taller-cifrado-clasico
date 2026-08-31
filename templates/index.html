@@ -68,7 +68,7 @@
                         {% if cantidad > 0 %}
                         <div class="freq-row">
                             <span class="freq-letra">{{ letra }}</span>
-                            <span class="freq-track"><span class="freq-fill" style="width: {{ (cantidad / resultado.frecuencia_max * 100) | round(1) }}%"></span></span>
+                            <span class="freq-fill" data-pct="{{ (cantidad / resultado.frecuencia_max * 100) | round(1) }}"></span>
                             <span class="freq-count">{{ cantidad }}</span>
                         </div>
                         {% endif %}
