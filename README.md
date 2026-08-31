@@ -1,6 +1,6 @@
 # Taller de Cifrado Clásico
 
-Aplicación web que realiza criptoanálisis automático de cifrados clásicos (César, Afín y Vigenère): calcula el Índice de Coincidencia, cuenta frecuencias de letras, identifica el tipo de cifrado y aplica el ataque correspondiente para recuperar el texto original y la clave — sin conocerla de antemano.
+Aplicación web que realiza criptoanálisis automático de cifrados clásicos (César, Afín y Vigenère): calcula el Índice de Coincidencia, cuenta frecuencias de letras, identifica el tipo de cifrado y aplica el ataque correspondiente para recuperar el texto original y la clave sin conocerla de antemano.
 
 **Sitio en producción:** http://www.rodriguezchavez.site
 
