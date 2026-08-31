@@ -1,6 +1,3 @@
-import unicodedata
-from math import gcd
-from functools import reduce
 from collections import defaultdict
 
 # Alfabeto español de 27 caracteres, tal como pide el PDF
@@ -300,9 +297,17 @@ def atacar_vigenere(texto_cifrado, max_longitud=15, umbral_ic=0.06):
 
 
 def analizar_criptograma(texto_cifrado_crudo):
+    """
+    Esta es la función maestra del código: normaliza el texto, calcula el IC, decide si el cifrado
+    es monoalfabético o polialfabético según el umbral, y aplica el ataque
+    correspondiente (César/Afín por chi-cuadrado, o Vigenère por Kasiski).
+    Por último, devuelve un diccionario con todo el detalle para mostrar en pantalla.
+    """
+
     texto_limpio = normalizar_texto(texto_cifrado_crudo)
     ic = calcular_ic(texto_limpio)
     frecuencias = contar_frecuencias(texto_limpio)
+    frecuencia_max = max(frecuencias.values()) if any(frecuencias.values()) else 1
 
     resultado = {
         'texto_normalizado': texto_limpio,
@@ -310,6 +315,7 @@ def analizar_criptograma(texto_cifrado_crudo):
         'ic': ic,
         'frecuencias': frecuencias,
         'kasiski': None,
+        'frecuencia_max': frecuencia_max,
     }
 
     UMBRAL_MONO = 0.06
