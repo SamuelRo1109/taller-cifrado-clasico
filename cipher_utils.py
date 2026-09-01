@@ -259,7 +259,7 @@ def dividir_en_columnas(texto, longitud_clave):
     return columnas
 
 
-def atacar_vigenere(texto_cifrado, max_longitud=15, umbral_ic=0.06):
+def atacar_vigenere(texto_cifrado, max_longitud=20, umbral_ic=0.06):
     """
     1. Prueba cada longitud de clave candidata de 2 a max_longitud.
     2. Para cada L, calcula el IC PROMEDIO de las L columnas (más confiable
